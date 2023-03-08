@@ -1,0 +1,202 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+#define MAX INT_MAX
+#define MIN INT_MIN
+#define ll long long int
+#define nline "\n"
+#define BIG 998244353
+#define MOD 1000000007
+#define fast_io ios_base::sync_with_stdio(false);cin.tie(NULL);cout.tie(NULL)
+#define pii pair<ll,ll>
+#define vi vector<ll>
+#define vb vector<bool>
+#define vc vector<char>
+#define vs vector<string>
+#define vvi vector<vi>
+#define vpii vector<pii>
+#define ff first
+#define ss second
+#define mkp make_pair
+#define pb emplace_back
+
+vector<vector<ll>> multiply(vvi &a,vvi &b){
+    ll n=a.size(),m=b[0].size();
+    vvi ans(n,vi(m,0));
+    for(ll i=0;i<n;i++){
+        for(ll j=0;j<m;j++){
+            for(ll k=0;k<b.size();k++){
+                (ans[i][j]+=(a[i][k]*b[k][j]%MOD))%=MOD;
+            }
+        }
+    }
+    return ans;
+}
+vector<vector<ll>> matrix_expo(vector<vector<ll>> a,ll b){
+    vvi ans(26, vi(26,0));
+    for(int i=0; i<26; i++)
+        ans[i][i]=1;
+
+    while(b>0){
+        if(b&1){
+            ans=multiply(ans,a);
+        }
+        a=multiply(a,a);
+        //printgraph(ans);
+        b>>=1;
+    }
+    return ans;
+}
+
+void solve(){
+    ll k=26;
+    vvi mat(26,vi(26,0)), dp(26,vi(1,1));
+    //vi dp(26,1);
+    for(int i=0; i<26; i++){
+        for(int j=0; j<26; j++){
+            cin>>mat[j][i];
+        }
+    }
+    int t;
+    cin>>t;
+    while (t--)
+    {
+        int l;
+        char c;
+        cin>>c;
+        cin>>l;
+        vvi ans=matrix_expo(mat,l-1);
+        int ch=c-'a';
+        ll val=0;
+        ans=multiply(ans,dp);
+        cout<<ans[ch][0]<<nline;
+    }
+    
+}
+
+int main(){
+
+    ios_base::sync_with_stdio(0);
+    cin.tie(NULL);
+
+    #ifndef ONLINE_JUDGE
+    freopen("input.txt","r",stdin);
+    freopen("output.txt","w",stdout);
+    #endif
+
+    int t=1;
+    //cin>>t;
+    while(t--)
+        solve();
+
+}
+/*
+    #include <bits/stdc++.h>
+     
+    #define MX 105
+    #define LOGMX 20
+    #define MOD 1000000007
+     
+    using namespace std;
+     
+    struct matrix {
+        int row, col;
+        vector<vector<int>> mat;
+        vector<matrix> powers;
+     
+        matrix() {}
+     
+        matrix(int r, int c, int v) { row = r, col = c, mat = vector<vector<int>> (row, vector<int>(col, v)); }
+     
+        matrix(int r, int c) : matrix(r, c, 0) {}
+     
+        matrix(vector<vector<int>> a) { row = a.size(), col = !a.empty() ? a[0].size() : 0, mat = a; }
+     
+        inline matrix getIdentity() {
+            matrix ret(row, col);
+     
+            for (int i = 0; i < row; i++) {
+                ret.mat[i][i] = 1;
+            }
+     
+            return ret;
+        }
+     
+        inline matrix operator * (matrix b) {
+            matrix ret(row, b.col);
+     
+            for (int i = 0; i < row; i++) {
+                for (int j = 0; j < b.col; j++) {
+                    for (int k = 0; k < col; k++) {
+                        long long tmp = (long long) mat[i][k] * b.mat[k][j] + ret.mat[i][j];
+                        if (tmp >= MOD) tmp %= MOD;
+                        
+                        ret.mat[i][j] = tmp;
+                    }
+     
+                }
+            }
+     
+            return ret;
+        }
+     
+        inline matrix operator *= (matrix b) {
+            return *this = *this * b;
+        }
+     
+        inline matrix operator ^ (long long k) {
+            matrix ret = getIdentity();
+            
+            if (powers.empty()) {
+                generate();
+            }
+            
+            for (int pw = 0; k; k >>= 1, pw++) {
+                if (k & 1) {
+                    ret *= powers[pw];
+                }
+            }
+     
+            return ret;
+        }
+        
+        void generate() {
+            matrix pw = *this;
+     
+            for (int i = 0; i < LOGMX; i++) {
+                powers.push_back(pw);
+     
+                pw *= pw;
+            }
+            
+        }
+    };
+     
+    int main() {
+        ios_base::sync_with_stdio(false);
+        cin.tie(NULL);
+        
+        matrix a(26, 26), b(26, 1, 1);
+        
+        for (int i = 0; i < 26; i++) {
+            for (int j = 0; j < 26; j++) {
+                int x;
+                cin >> x;
+                
+                a.mat[j][i] = x;
+            }
+        }
+        
+        int t;
+        cin >> t;
+        
+        while (t--) {
+            char c;
+            int n;
+            cin >> c >> n;
+            
+            cout << ((a ^ (n - 1)) * b).mat[c - 'a'][0] << endl;
+        }
+     
+        return 0;
+    }
